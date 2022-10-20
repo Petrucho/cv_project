@@ -51,4 +51,4 @@ if uploadFile is not None:
     if round(percentage[index[0]].item())<50:
         st.metric(label="Perhaps its a", value=labels[index[0]].split("'")[1], delta=percentage[index[0]].item()*(-1))
     else:
-        st.metric(label="Perhaps its a", value=labels[index[0]].split("'")[1], delta=percentage[index[0]].item())
+        st.metric(label="Its should be a", value=labels[index[0]].split("'")[1], delta=percentage[index[0]].item())
