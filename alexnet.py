@@ -30,14 +30,11 @@ def load_image(img):
 
 # Uploading the File to the Page
 uploadFile = st.file_uploader(label="Upload image", type=['jpg', 'png'])
-
 if uploadFile is not None:
-    img, image = load_image(uploadFile)
-    st.image(img)
-    st.write("Image Uploaded Successfully")
+    img, _ = load_image(uploadFile)
+    st.image(img)    
 
-    img_t = transform(img)
-    # img_t = transform(opencv_image)
+    img_t = transform(img)    
     batch_t = torch.unsqueeze(img_t, 0)
 
     alexnet.eval()
@@ -46,12 +43,12 @@ if uploadFile is not None:
     
     _, index = torch.max(out, 1) 
     percentage = torch.nn.functional.softmax(out, dim=1)[0] * 100
-    print(labels[index[0]], percentage[index[0]].item())
+    # print(labels[index[0]].split("'")[1], percentage[index[0]].item())
 
     # print(f'type(labels[index[0]]): {type(labels[index[0]])}')
 
-    st.title('Prediction of the AlexNet')
-
-    st.metric(label="Perhaps its a", value=labels[index[0]], delta=percentage[index[0]].item())
-
-
+    st.title('Prediction from the AlexNet model')
+    if round(percentage[index[0]].item())<50:
+        st.metric(label="Perhaps its a", value=labels[index[0]].split("'")[1], delta=percentage[index[0]].item()*(-1))
+    else:
+        st.metric(label="Perhaps its a", value=labels[index[0]].split("'")[1], delta=percentage[index[0]].item())
