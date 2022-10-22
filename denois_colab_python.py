@@ -75,9 +75,11 @@ def load_image(img):
     print(f'\nthe path is:\n{current_directory + "/" + img.name}\n')
     im.save(current_directory + "/" + img.name)
     image = np.array(im)
-    return im, image
+    path = current_directory + "/" + img.name
+    return path, im #, image
 
 def preprocess(img):    
+    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     img = np.asarray(img, dtype="float32")
     img = img/255.0 #Scaling the pixel values    
     return img.reshape(400,400,1)
@@ -85,30 +87,26 @@ def preprocess(img):
 
 # Uploading the File to the Page
 uploadFile = st.file_uploader(label="Upload image", type=['jpg', 'png'])
-if uploadFile is not None:
-    img, image = load_image(uploadFile)
-    # print(f'\nuploadFile: {uploadFile}\n')
-    # print(f'\ntype(uploadFile): {type(uploadFile)}\n')
-    # print(f'\nimg: {img}\n')
-    # print(f'\nimage: {image}\n')
-    
+if uploadFile is not None:    
+    path, img = load_image(uploadFile)
+        
     # showing original image
     st.write('Noising image')    
-    st.image(img)
-    # print(f'type(img): {type(img)}\n')
+    st.image(img)    
         
     test_imgs = []    
-    print('\nbefore preprocess\n')
-    test_imgs.append(preprocess(img))
-    print('\nafter preprocess\n')
+    # print('\nbefore preprocess\n')
+    # print(f'\npath: {path}\n')
+    test_imgs.append(preprocess(path))
+    # print('\nafter preprocess\n')
     test_imgs = np.asarray(test_imgs)
 
     # # get cleaned images using trained model
-    # img_predicted = model.predict(test_imgs, batch_size=2)
+    img_predicted = model.predict(test_imgs, batch_size=2)
     # print(f'type(img_predicted): {type(img_predicted)}\n')    
 
     # # get cleaned images using trained model
-    # img_predicted = model.predict(test_imgs, batch_size=2)
-    # for i, (predicted, testing_path) in enumerate(zip(img_predicted, uploadFile)):
-    #     predicted_sequeeze = (np.squeeze(predicted) * 255).astype("uint8")
-    #     st.image(predicted_sequeeze)
+    img_predicted = model.predict(test_imgs, batch_size=2)
+    for i, (predicted, testing_path) in enumerate(zip(img_predicted, uploadFile)):
+        predicted_sequeeze = (np.squeeze(predicted) * 255).astype("uint8")
+        st.image(predicted_sequeeze)
